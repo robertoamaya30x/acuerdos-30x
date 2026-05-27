@@ -24,13 +24,36 @@ function getTodayISO(): string {
   return `${y}-${m}-${d}`;
 }
 
+async function svgToBase64(svgPath: string, w: number, h: number): Promise<string> {
+  const response = await fetch(svgPath);
+  const svgText = await response.text();
+  const blob = new Blob([svgText], { type: 'image/svg+xml;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  return new Promise((resolve, reject) => {
+    const img = document.createElement('img') as HTMLImageElement;
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d')!;
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(0, 0, w, h);
+      ctx.drawImage(img, 0, 0, w, h);
+      URL.revokeObjectURL(url);
+      resolve(canvas.toDataURL('image/png'));
+    };
+    img.onerror = reject;
+    img.src = url;
+  });
+}
+
 function textToPdfContent(text: string): any[] {
   const paragraphs = text.split(/\n\n+/);
   const content: any[] = [];
 
   const headingStarters = [
     'PRIMERA', 'SEGUNDA', 'TERCERA', 'CUARTA', 'QUINTA',
-    'SEXTA', 'SÉPTIMA', 'ACUERDO DE PAGO', 'FIRMAS',
+    'SEXTA', 'SÉPTIMA', 'ACUERDO DE PAGO',
   ];
 
   for (const para of paragraphs) {
@@ -38,19 +61,14 @@ function textToPdfContent(text: string): any[] {
     const trimmed = para.trim();
     const isHeading = headingStarters.some((s) => trimmed.startsWith(s));
     const isBullet = trimmed.startsWith('•');
-    const isSignatureLine =
-      trimmed.startsWith('____') ||
-      trimmed.startsWith('Nombre:') ||
-      trimmed.startsWith('Pasaporte:') ||
-      trimmed.startsWith('Cargo:') ||
-      trimmed.startsWith('Por 30X');
 
     if (isHeading) {
       content.push({ text: trimmed, bold: true, fontSize: 11, margin: [0, 8, 0, 4] });
-    } else if (isBullet || isSignatureLine) {
-      content.push({ text: trimmed, fontSize: 10, margin: [0, 2, 0, 2] });
+    } else if (isBullet) {
+      content.push({ text: trimmed, fontSize: 10, margin: [0, 0, 0, 3] });
     } else {
-      content.push({ text: trimmed, fontSize: 10, margin: [0, 4, 0, 4] });
+      // Uniform body spacing — no top margin to avoid doubling
+      content.push({ text: trimmed, fontSize: 10, margin: [0, 0, 0, 5] });
     }
   }
 
@@ -138,15 +156,15 @@ export default function HomePage() {
   };
 
   const handleGenerarPDF = async () => {
-    const pdfMakeModule = await import('pdfmake/build/pdfmake');
+    const [pdfMakeModule, pdfFontsModule, logoBase64] = await Promise.all([
+      import('pdfmake/build/pdfmake'),
+      import('pdfmake/build/vfs_fonts'),
+      svgToBase64('/30x-logo-dark.svg', 240, 80),
+    ]);
+
     const pdfMake = (pdfMakeModule as any).default || pdfMakeModule;
-    const pdfFontsModule = await import('pdfmake/build/vfs_fonts');
     const pdfFonts = (pdfFontsModule as any).default || pdfFontsModule;
-    if (pdfFonts.pdfMake) {
-      pdfMake.vfs = pdfFonts.pdfMake.vfs;
-    } else {
-      pdfMake.vfs = (pdfFonts as any).vfs;
-    }
+    pdfMake.vfs = pdfFonts.pdfMake ? pdfFonts.pdfMake.vfs : (pdfFonts as any).vfs;
 
     const datos: DatosFormulario = {
       NOMBRE_PARTICIPANTE: nombre,
@@ -170,6 +188,7 @@ export default function HomePage() {
     const beforeTable = partes[0] ?? '';
     const afterTable = partes[1] ?? '';
 
+    // --- Tablas de cuotas y datos bancarios ---
     const tablaCuotas: any = {
       table: {
         headerRows: 1,
@@ -211,6 +230,7 @@ export default function HomePage() {
       margin: [0, 8, 0, 8],
     };
 
+    // --- Limpiar afterTable: quitar líneas bancarias y separar sección FIRMAS ---
     const bankLines = new Set([
       'Beneficiario: 30X LLC',
       'Banco: Choice Financial Group (Mercury)',
@@ -222,27 +242,66 @@ export default function HomePage() {
       'Dirección beneficiario: 30 North Gould Street, STE R, Sheridan, WY 82801, EE. UU.',
     ]);
 
-    const cleanedAfterLines = afterTable
-      .split('\n')
-      .filter((line) => !bankLines.has(line.trim()));
+    const afterLines = afterTable.split('\n').filter((l) => !bankLines.has(l.trim()));
+    const firmasIdx = afterLines.findIndex((l) => l.trim() === 'FIRMAS');
+    const textBeforeFirmas = firmasIdx >= 0
+      ? afterLines.slice(0, firmasIdx).join('\n')
+      : afterLines.join('\n');
 
+    // --- Bloque de firmas en dos columnas ---
+    const firmasBlock: any = {
+      margin: [0, 24, 0, 0],
+      stack: [
+        { text: 'FIRMAS', bold: true, fontSize: 11, margin: [0, 0, 0, 0] },
+        {
+          margin: [0, 0, 0, 0],
+          columns: [
+            {
+              width: '*',
+              stack: [
+                // 60pt de espacio para firmar
+                { text: ' ', fontSize: 10, margin: [0, 60, 0, 0] },
+                { text: '____________________________', fontSize: 10, margin: [0, 0, 0, 6] },
+                { text: 'Por 30X LLC', fontSize: 9, bold: true, margin: [0, 0, 0, 2] },
+                { text: 'Nombre: Dylan Rosemberg', fontSize: 9, margin: [0, 0, 0, 1] },
+                { text: 'Pasaporte: AAI462007', fontSize: 9, margin: [0, 0, 0, 1] },
+                { text: 'Cargo: Representante Legal 30X LLC', fontSize: 9 },
+              ],
+            },
+            {
+              width: '*',
+              stack: [
+                { text: ' ', fontSize: 10, margin: [0, 60, 0, 0] },
+                { text: '____________________________', fontSize: 10, alignment: 'right', margin: [0, 0, 0, 6] },
+                { text: 'PARTICIPANTE / DEUDOR', fontSize: 9, bold: true, alignment: 'right', margin: [0, 0, 0, 2] },
+                { text: `Nombre completo: ${nombre}`, fontSize: 9, alignment: 'right', margin: [0, 0, 0, 1] },
+                { text: `Documento: ${tipoDoc} ${numDoc}`, fontSize: 9, alignment: 'right' },
+              ],
+            },
+          ],
+        },
+      ],
+    };
+
+    // --- Construir contenido final ---
     const content: any[] = [
       ...textToPdfContent(beforeTable),
       tablaCuotas,
       { text: 'Los pagos deberán realizarse, principalmente, mediante transferencia bancaria a nombre de:', fontSize: 10, margin: [0, 4, 0, 4] },
       tablaBancaria,
-      ...textToPdfContent(cleanedAfterLines.join('\n')),
+      ...textToPdfContent(textBeforeFirmas),
+      firmasBlock,
     ];
 
     const docDefinition: any = {
       pageSize: 'LETTER',
       pageMargins: [72, 72, 72, 72],
-      header: {
-        columns: [
-          { text: '', width: '*' },
-          { text: '30X', bold: true, fontSize: 16, width: 'auto', margin: [0, 20, 72, 0] },
-        ],
-      },
+      header: (_currentPage: number, _pageCount: number) => ({
+        image: logoBase64,
+        width: 60,
+        margin: [0, 20, 72, 0],
+        alignment: 'right',
+      }),
       content,
       defaultStyle: { font: 'Roboto', fontSize: 10, lineHeight: 1.4 },
     };
