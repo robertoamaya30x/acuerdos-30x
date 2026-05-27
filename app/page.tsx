@@ -70,10 +70,33 @@ export default function HomePage() {
   const [direccion, setDireccion] = useState('');
   const [fechaAcuerdo, setFechaAcuerdo] = useState(getTodayISO());
   const [montoTotal, setMontoTotal] = useState('');
-  const [numeroCuotas, setNumeroCuotas] = useState(1);
+  const [numeroCuotasInput, setNumeroCuotasInput] = useState('1');
+  const [cuotasError, setCuotasError] = useState('');
   const [cuotas, setCuotas] = useState<CuotaInput[]>([{ importe: '', fechaLimite: '' }]);
 
+  const numeroCuotas = parseInt(numeroCuotasInput);
+  const numeroCuotasValido = /^\d+$/.test(numeroCuotasInput) && numeroCuotas >= 1 && numeroCuotas <= 6;
+
+  const handleNumeroCuotasChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const raw = e.target.value;
+    if (raw !== '' && !/^\d+$/.test(raw)) return; // bloquea puntos, comas, letras
+    setNumeroCuotasInput(raw);
+    if (raw === '') {
+      setCuotasError('');
+      return;
+    }
+    const val = parseInt(raw);
+    if (val > 6) {
+      setCuotasError('El número de cuotas máximo es 6');
+    } else if (val < 1) {
+      setCuotasError('El número mínimo es 1 cuota');
+    } else {
+      setCuotasError('');
+    }
+  };
+
   useEffect(() => {
+    if (!numeroCuotasValido) return;
     setCuotas((prev) => {
       const next: CuotaInput[] = [];
       for (let i = 0; i < numeroCuotas; i++) {
@@ -81,7 +104,7 @@ export default function HomePage() {
       }
       return next;
     });
-  }, [numeroCuotas]);
+  }, [numeroCuotas, numeroCuotasValido]);
 
   const sumaCuotas = cuotas.reduce((acc, c) => {
     const val = parseFloat(c.importe);
@@ -104,7 +127,7 @@ export default function HomePage() {
     (c) => c.importe.trim() === '' || c.fechaLimite.trim() === ''
   );
 
-  const isDisabled = camposVacios || cuotasIncompletas || !montosCoinciden;
+  const isDisabled = camposVacios || cuotasIncompletas || !montosCoinciden || !numeroCuotasValido || !!cuotasError;
 
   const updateCuota = (index: number, field: keyof CuotaInput, value: string) => {
     setCuotas((prev) => {
@@ -428,16 +451,19 @@ export default function HomePage() {
                     Número de cuotas <span style={{ color: '#EF4444' }}>*</span>
                   </label>
                   <input
-                    type="number"
-                    value={numeroCuotas}
-                    onChange={(e) => {
-                      const val = Math.min(6, Math.max(1, parseInt(e.target.value) || 1));
-                      setNumeroCuotas(val);
-                    }}
-                    min={1}
-                    max={6}
+                    type="text"
+                    inputMode="numeric"
+                    value={numeroCuotasInput}
+                    onChange={handleNumeroCuotasChange}
+                    placeholder="1–6"
                     className={inputClass}
+                    style={cuotasError ? { borderColor: '#EF4444', boxShadow: '0 0 0 2px rgba(239,68,68,0.15)' } : {}}
                   />
+                  {cuotasError && (
+                    <p className="mt-1.5 text-xs font-medium" style={{ color: '#EF4444' }}>
+                      {cuotasError}
+                    </p>
+                  )}
                 </div>
               </div>
 
