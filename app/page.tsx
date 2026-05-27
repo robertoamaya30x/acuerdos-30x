@@ -284,12 +284,21 @@ export default function HomePage() {
     };
 
     // --- Construir contenido final ---
+    // Filtrar también la frase introductoria bancaria del texto (ya se renderiza antes de tablaBancaria)
+    const frasesBancarias = new Set([
+      'Los pagos deberán realizarse, principalmente, mediante transferencia bancaria a nombre de:',
+    ]);
+    const textBeforeFirmasFinal = textBeforeFirmas
+      .split(/\n\n+/)
+      .filter((p) => !frasesBancarias.has(p.trim()))
+      .join('\n\n');
+
     const content: any[] = [
       ...textToPdfContent(beforeTable),
       tablaCuotas,
       { text: 'Los pagos deberán realizarse, principalmente, mediante transferencia bancaria a nombre de:', fontSize: 10, margin: [0, 4, 0, 4] },
       tablaBancaria,
-      ...textToPdfContent(textBeforeFirmas),
+      ...textToPdfContent(textBeforeFirmasFinal),
       firmasBlock,
     ];
 
