@@ -3,9 +3,7 @@ Programa {{NOMBRE_PARTICIPANTE}}
 Bogotá D.C., {{FECHA_ACUERDO}}
 
 Entre los suscritos, por una parte 30X LLC, sociedad constituida conforme a las leyes de los Estados Unidos de América, con domicilio en 30 North Gould Street, STE R, Sheridan, WY 82801, EE. UU., con EIN 61-2305049, titular de la cuenta de cheques No. 202508734194 en Choice Financial Group, ABA 091311229, SWIFT/BIC CHFGUS44021, con dirección bancaria 4501 23rd Avenue S, Fargo, ND 58104, EE. UU. (en adelante, "30X" o el "ACREEDOR");
-
 y por la otra, {{NOMBRE_PARTICIPANTE}}, mayor de edad, identificado(a) con {{TIPO_DOCUMENTO}} No. {{NUMERO_DOCUMENTO}}, con domicilio en {{CIUDAD_PAIS}}, dirección {{DIRECCION}} (en adelante, el "PARTICIPANTE" o el "DEUDOR");
-
 se celebra el presente ACUERDO DE PAGO Y RECONOCIMIENTO DE DEUDA (el "Acuerdo"), regido por las siguientes cláusulas:
 
 PRIMERA – Objeto
@@ -55,7 +53,7 @@ El PARTICIPANTE declara que comprende y acepta que el valor del Programa es no r
 
 SEXTA – Ley aplicable y jurisdicción
 
-Este Acuerdo se regirá por las leyes de la República de Colombia. Para todos los efectos legales, las partes fijan como jurisdicción preferente la de los juzgados de la ciudad de Bogotá D.C.
+Este Acuerdo se regirá por las leyes del Estado de Wyoming, Estados Unidos de América. Para todos los efectos legales, las partes fijan como jurisdicción preferente la de los tribunales competentes del Estado de Wyoming, EE. UU.
 
 SÉPTIMA – Aceptación y firma
 
