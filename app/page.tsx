@@ -229,7 +229,7 @@ export default function HomePage() {
   };
 
   const tipoDocCampo = camposConfig.campos_participante.find((c) => c.id === 'TIPO_DOCUMENTO');
-  const tipoDocOpciones = tipoDocCampo && 'opciones' in tipoDocCampo ? tipoDocCampo.opciones : [];
+  const tipoDocOpciones: string[] = (tipoDocCampo && 'opciones' in tipoDocCampo ? tipoDocCampo.opciones : []) ?? [];
   const montoDefinido = montoTotal !== '' && !isNaN(parseFloat(montoTotal));
   const cuotasDefinidas = cuotas.every((c) => c.importe !== '');
 
