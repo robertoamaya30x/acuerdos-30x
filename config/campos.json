@@ -1,0 +1,70 @@
+{
+  "nombre_programa": "30X Inmersivo",
+  "campos_participante": [
+    {
+      "id": "NOMBRE_PARTICIPANTE",
+      "label": "Nombre completo",
+      "tipo": "text",
+      "placeholder": "Ej: Jhony Antonio Rodríguez Silva",
+      "requerido": true
+    },
+    {
+      "id": "TIPO_DOCUMENTO",
+      "label": "Tipo de documento",
+      "tipo": "select",
+      "opciones": [
+        "Cédula de Ciudadanía",
+        "Cédula de Extranjería",
+        "Cédula de Identificación",
+        "Pasaporte",
+        "RUT",
+        "DNI"
+      ],
+      "requerido": true
+    },
+    {
+      "id": "NUMERO_DOCUMENTO",
+      "label": "Número de documento",
+      "tipo": "text",
+      "placeholder": "Ej: 18.790.150",
+      "requerido": true
+    },
+    {
+      "id": "CIUDAD_PAIS",
+      "label": "Ciudad y país de domicilio",
+      "tipo": "text",
+      "placeholder": "Ej: Bogotá, Colombia",
+      "requerido": true
+    },
+    {
+      "id": "DIRECCION",
+      "label": "Dirección",
+      "tipo": "text",
+      "placeholder": "Ej: Calle 123 #45-67",
+      "requerido": false
+    },
+    {
+      "id": "FECHA_ACUERDO",
+      "label": "Fecha del acuerdo",
+      "tipo": "date",
+      "requerido": true
+    }
+  ],
+  "campos_pago": [
+    {
+      "id": "MONTO_TOTAL",
+      "label": "Monto total (USD)",
+      "tipo": "number",
+      "placeholder": "Ej: 4000",
+      "requerido": true
+    },
+    {
+      "id": "NUMERO_CUOTAS",
+      "label": "Número de cuotas",
+      "tipo": "number",
+      "min": 1,
+      "max": 6,
+      "requerido": true
+    }
+  ]
+}

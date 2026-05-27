@@ -1,0 +1,75 @@
+ACUERDO DE PAGO Y RECONOCIMIENTO DE DEUDA
+Programa {{NOMBRE_PARTICIPANTE}}
+Bogotá D.C., {{FECHA_ACUERDO}}
+
+Entre los suscritos, por una parte 30X LLC, sociedad constituida conforme a las leyes de los Estados Unidos de América, con domicilio en 30 North Gould Street, STE R, Sheridan, WY 82801, EE. UU., con EIN 61-2305049, titular de la cuenta de cheques No. 202508734194 en Choice Financial Group, ABA 091311229, SWIFT/BIC CHFGUS44021, con dirección bancaria 4501 23rd Avenue S, Fargo, ND 58104, EE. UU. (en adelante, "30X" o el "ACREEDOR");
+
+y por la otra, {{NOMBRE_PARTICIPANTE}}, mayor de edad, identificado(a) con {{TIPO_DOCUMENTO}} No. {{NUMERO_DOCUMENTO}}, con domicilio en {{CIUDAD_PAIS}}, dirección {{DIRECCION}} (en adelante, el "PARTICIPANTE" o el "DEUDOR");
+
+se celebra el presente ACUERDO DE PAGO Y RECONOCIMIENTO DE DEUDA (el "Acuerdo"), regido por las siguientes cláusulas:
+
+PRIMERA – Objeto
+
+El PARTICIPANTE declara que se inscribió y fue aceptado en el programa "{{NOMBRE_PROGRAMA}}" ofrecido por 30X (el "Programa") y que, con ocasión de dicha inscripción, adeuda a favor de 30X la suma total de {{MONTO_LETRAS}} (USD {{MONTO_TOTAL}}), correspondiente al valor del Programa.
+
+Mediante este Acuerdo, el PARTICIPANTE reconoce de manera expresa, clara y exigible dicha obligación de pago a favor de 30X y se compromete a cancelarla en los términos y condiciones aquí establecidos.
+
+SEGUNDA – Calendario de pagos
+
+El PARTICIPANTE se obliga a pagar el valor adeudado en {{NUMERO_CUOTAS}} cuota(s) así:
+
+{{TABLA_CUOTAS}}
+
+Los pagos deberán realizarse, principalmente, mediante transferencia bancaria a nombre de:
+
+Beneficiario: 30X LLC
+Banco: Choice Financial Group (Mercury)
+Tipo de cuenta: Checking
+Número de cuenta: 202508734194
+ABA: 091311229
+SWIFT/BIC: CHFGUS44021
+Dirección banco: 4501 23rd Avenue S, Fargo, ND 58104, EE. UU.
+Dirección beneficiario: 30 North Gould Street, STE R, Sheridan, WY 82801, EE. UU.
+
+O en su defecto solicitar con antelación el Link de pago mediante Stripe.
+
+El PARTICIPANTE se obliga a enviar a 30X el comprobante de pago de cada cuota al correo electrónico que la empresa designe.
+
+TERCERA – Plazo y mora
+
+• Plazo: Cada cuota deberá pagarse a más tardar en la fecha límite señalada en la cláusula anterior.
+• Mora automática: El simple vencimiento del plazo sin que el pago se haya efectuado genera mora automática, sin necesidad de requerimiento previo.
+• Intereses moratorios: En caso de mora, el PARTICIPANTE pagará a 30X un interés moratorio equivalente a 1.2% mensual sobre el saldo pendiente.
+• Gastos de cobro: El PARTICIPANTE reconoce que, en caso de requerirse gestiones de cobro prejurídico o jurídico, asumirá los costos razonables en que incurra 30X.
+
+CUARTA – Consecuencias del incumplimiento
+
+En caso de que el PARTICIPANTE incumpla el pago de cualquiera de las cuotas:
+• 30X podrá suspender inmediatamente el acceso del PARTICIPANTE al Programa, sin que ello implique condonación del saldo adeudado.
+• 30X podrá exigir de inmediato la totalidad del saldo pendiente (cláusula de aceleración).
+• 30X quedará facultado para iniciar las acciones de cobro ante las autoridades competentes.
+
+QUINTA – No reembolso
+
+El PARTICIPANTE declara que comprende y acepta que el valor del Programa es no reembolsable, salvo que 30X comunique por escrito una política distinta. El retiro voluntario del Programa no lo libera de la obligación de pagar.
+
+SEXTA – Ley aplicable y jurisdicción
+
+Este Acuerdo se regirá por las leyes de la República de Colombia. Para todos los efectos legales, las partes fijan como jurisdicción preferente la de los juzgados de la ciudad de Bogotá D.C.
+
+SÉPTIMA – Aceptación y firma
+
+El PARTICIPANTE declara que:
+• Ha leído en su totalidad el presente Acuerdo.
+• Comprende el alcance de las obligaciones que asume.
+• Reconoce que la deuda aquí descrita es real, cierta, líquida y exigible.
+• Firma este documento libre y voluntariamente.
+
+FIRMAS
+
+Por 30X LLC                                PARTICIPANTE / DEUDOR
+
+____________________________               ____________________________
+Nombre: Dylan Rosemberg                    Nombre completo: {{NOMBRE_PARTICIPANTE}}
+Pasaporte: AAI462007                       Documento de identidad: {{TIPO_DOCUMENTO}} {{NUMERO_DOCUMENTO}}
+Cargo: Representante Legal 30X LLC
