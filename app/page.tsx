@@ -168,8 +168,9 @@ export default function HomePage() {
       ]);
 
       const pdfMake = (pdfMakeModule as any).default ?? pdfMakeModule;
-      const pdfFonts = (pdfFontsModule as any).default ?? pdfFontsModule;
-      pdfMake.vfs = pdfFonts?.pdfMake?.vfs ?? pdfFonts?.vfs ?? {};
+      // vfs_fonts exports the vfs object directly (module.exports = vfs)
+      const vfs = (pdfFontsModule as any).default ?? pdfFontsModule;
+      pdfMake.vfs = vfs;
 
       let logoBase64: string | null = null;
       try {
