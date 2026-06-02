@@ -155,16 +155,28 @@ export default function HomePage() {
     });
   };
 
-  const handleGenerarPDF = async () => {
-    const [pdfMakeModule, pdfFontsModule, logoBase64] = await Promise.all([
-      import('pdfmake/build/pdfmake'),
-      import('pdfmake/build/vfs_fonts'),
-      svgToBase64('/30x-logo-dark.svg', 240, 80),
-    ]);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [pdfError, setPdfError] = useState('');
 
-    const pdfMake = (pdfMakeModule as any).default || pdfMakeModule;
-    const pdfFonts = (pdfFontsModule as any).default || pdfFontsModule;
-    pdfMake.vfs = pdfFonts.pdfMake ? pdfFonts.pdfMake.vfs : (pdfFonts as any).vfs;
+  const handleGenerarPDF = async () => {
+    setIsGenerating(true);
+    setPdfError('');
+    try {
+      const [pdfMakeModule, pdfFontsModule] = await Promise.all([
+        import('pdfmake/build/pdfmake'),
+        import('pdfmake/build/vfs_fonts'),
+      ]);
+
+      const pdfMake = (pdfMakeModule as any).default ?? pdfMakeModule;
+      const pdfFonts = (pdfFontsModule as any).default ?? pdfFontsModule;
+      pdfMake.vfs = pdfFonts?.pdfMake?.vfs ?? pdfFonts?.vfs ?? {};
+
+      let logoBase64: string | null = null;
+      try {
+        logoBase64 = await svgToBase64('/30x-logo-dark.svg', 240, 80);
+      } catch {
+        // logo no crítico — continúa sin él
+      }
 
     const datos: DatosFormulario = {
       NOMBRE_PARTICIPANTE: nombre,
@@ -305,18 +317,26 @@ export default function HomePage() {
     const docDefinition: any = {
       pageSize: 'LETTER',
       pageMargins: [72, 72, 72, 72],
-      header: (_currentPage: number, _pageCount: number) => ({
-        image: logoBase64,
-        width: 60,
-        margin: [0, 20, 72, 0],
-        alignment: 'right',
-      }),
+      ...(logoBase64 ? {
+        header: (_currentPage: number, _pageCount: number) => ({
+          image: logoBase64,
+          width: 60,
+          margin: [0, 20, 72, 0],
+          alignment: 'right',
+        }),
+      } : {}),
       content,
       defaultStyle: { font: 'Roboto', fontSize: 10, lineHeight: 1.4 },
     };
 
     const filename = `acuerdo_pago_${nombre.replace(/\s+/g, '_')}_${fechaAcuerdo.replace(/-/g, '')}.pdf`;
     pdfMake.createPdf(docDefinition).download(filename);
+    } catch (err) {
+      console.error('Error generando PDF:', err);
+      setPdfError('No se pudo generar el PDF. Intenta de nuevo.');
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const tipoDocCampo = camposConfig.campos_participante.find((c) => c.id === 'TIPO_DOCUMENTO');
@@ -647,10 +667,10 @@ export default function HomePage() {
           {/* Generate button */}
           <button
             onClick={handleGenerarPDF}
-            disabled={isDisabled}
+            disabled={isDisabled || isGenerating}
             className="w-full py-3 px-6 rounded-lg text-sm font-semibold transition duration-100 ease-linear"
             style={
-              isDisabled
+              isDisabled || isGenerating
                 ? { backgroundColor: '#F5F5F5', color: '#A3A3A3', cursor: 'not-allowed' }
                 : {
                     backgroundColor: '#1A1A1A',
@@ -660,18 +680,23 @@ export default function HomePage() {
                   }
             }
             onMouseEnter={(e) => {
-              if (!isDisabled) (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#262626';
+              if (!isDisabled && !isGenerating) (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#262626';
             }}
             onMouseLeave={(e) => {
-              if (!isDisabled) (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#1A1A1A';
+              if (!isDisabled && !isGenerating) (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#1A1A1A';
             }}
           >
-            Generar y Descargar PDF
+            {isGenerating ? 'Generando PDF...' : 'Generar y Descargar PDF'}
           </button>
 
-          {isDisabled && (
+          {isDisabled && !isGenerating && (
             <p className="text-center text-xs mt-2.5" style={{ color: '#A3A3A3' }}>
               Completa todos los campos y verifica que los montos coincidan.
+            </p>
+          )}
+          {pdfError && (
+            <p className="text-center text-xs mt-2.5 font-medium" style={{ color: '#EF4444' }}>
+              {pdfError}
             </p>
           )}
         </div>
