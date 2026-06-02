@@ -14,6 +14,7 @@ import camposConfig from '../config/campos.json';
 interface CuotaInput {
   importe: string;
   fechaLimite: string;
+  estado: 'Pendiente' | 'Pagada';
 }
 
 function getTodayISO(): string {
@@ -90,7 +91,7 @@ export default function HomePage() {
   const [montoTotal, setMontoTotal] = useState('');
   const [numeroCuotasInput, setNumeroCuotasInput] = useState('1');
   const [cuotasError, setCuotasError] = useState('');
-  const [cuotas, setCuotas] = useState<CuotaInput[]>([{ importe: '', fechaLimite: '' }]);
+  const [cuotas, setCuotas] = useState<CuotaInput[]>([{ importe: '', fechaLimite: '', estado: 'Pendiente' }]);
 
   const numeroCuotas = parseInt(numeroCuotasInput);
   const numeroCuotasValido = /^\d+$/.test(numeroCuotasInput) && numeroCuotas >= 1 && numeroCuotas <= 6;
@@ -118,7 +119,7 @@ export default function HomePage() {
     setCuotas((prev) => {
       const next: CuotaInput[] = [];
       for (let i = 0; i < numeroCuotas; i++) {
-        next.push(prev[i] ?? { importe: '', fechaLimite: '' });
+        next.push(prev[i] ?? { importe: '', fechaLimite: '', estado: 'Pendiente' });
       }
       return next;
     });
@@ -150,7 +151,7 @@ export default function HomePage() {
   const updateCuota = (index: number, field: keyof CuotaInput, value: string) => {
     setCuotas((prev) => {
       const updated = [...prev];
-      updated[index] = { ...updated[index], [field]: value };
+      updated[index] = { ...updated[index], [field]: value } as CuotaInput;
       return updated;
     });
   };
@@ -192,6 +193,7 @@ export default function HomePage() {
         numero: i + 1,
         importe: parseFloat(c.importe),
         fechaLimite: c.fechaLimite,
+        estado: c.estado,
       })),
     };
 
@@ -217,7 +219,12 @@ export default function HomePage() {
             { text: `Cuota ${i + 1}`, fontSize: 9 },
             { text: `USD ${c.importe.toLocaleString('en-US', { minimumFractionDigits: 2 })}`, fontSize: 9 },
             { text: formatearFecha(c.fechaLimite), fontSize: 9 },
-            { text: '• Pendiente', fontSize: 9 },
+            {
+              text: c.estado === 'Pagada' ? '✓ Pagada' : '• Pendiente',
+              fontSize: 9,
+              color: c.estado === 'Pagada' ? '#16A34A' : '#525252',
+              bold: c.estado === 'Pagada',
+            },
           ]),
         ],
       },
@@ -587,6 +594,12 @@ export default function HomePage() {
                           >
                             Fecha límite <span style={{ color: '#EF4444' }}>*</span>
                           </th>
+                          <th
+                            className="text-left px-4 py-2.5"
+                            style={{ fontSize: '11px', fontWeight: 600, color: '#737373', letterSpacing: '0.02em' }}
+                          >
+                            Estado
+                          </th>
                         </tr>
                       </thead>
                       <tbody>
@@ -623,6 +636,19 @@ export default function HomePage() {
                                 onChange={(e) => updateCuota(i, 'fechaLimite', e.target.value)}
                                 className="w-full border border-[rgba(0,0,0,0.12)] rounded-md px-2.5 py-1.5 text-sm font-medium text-[#1A1A1A] bg-white focus:outline-none focus:ring-2 focus:ring-[#1A1A1A] transition duration-100"
                               />
+                            </td>
+                            <td className="px-4 py-2.5">
+                              <button
+                                type="button"
+                                onClick={() => updateCuota(i, 'estado', cuota.estado === 'Pendiente' ? 'Pagada' : 'Pendiente')}
+                                className="text-xs font-semibold px-2.5 py-1 rounded-full transition duration-100"
+                                style={cuota.estado === 'Pagada'
+                                  ? { backgroundColor: '#DCFCE7', color: '#16A34A', border: '1px solid #BBF7D0' }
+                                  : { backgroundColor: '#F5F5F5', color: '#737373', border: '1px solid rgba(0,0,0,0.08)' }
+                                }
+                              >
+                                {cuota.estado === 'Pagada' ? '✓ Pagada' : '• Pendiente'}
+                              </button>
                             </td>
                           </tr>
                         ))}

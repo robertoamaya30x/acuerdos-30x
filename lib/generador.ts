@@ -6,6 +6,7 @@ export interface Cuota {
   numero: number;
   importe: number;
   fechaLimite: string;
+  estado: 'Pendiente' | 'Pagada';
 }
 
 export interface DatosFormulario {
